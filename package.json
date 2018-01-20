@@ -3,7 +3,19 @@
     "description": "A lightweight node.js framework for http and socket.io server application.",
     "homepage": "https://github.com/megaads-vn",
     "author": "Megaads <info.megaads@gmail.com>",
-    "keywords": ["framework", "http", "socket.io", "mvc", "lightweight", "server", "engine", "real time", "notification", "chat", "rest"],
+    "keywords": [
+        "framework",
+        "http",
+        "socket.io",
+        "mvc",
+        "lightweight",
+        "server",
+        "engine",
+        "real time",
+        "notification",
+        "chat",
+        "rest"
+    ],
     "license": "MIT",
     "version": "0.7.1",
     "main": "app.js",
@@ -13,9 +25,12 @@
         "url": "git+https://github.com/megaads-vn/quicksort.io"
     },
     "dependencies": {
-        "socket.io": "1.*",
+        "bcrypt": "^1.0.3",
+        "crypto": "*",
         "ejs": "2.*",
+        "jsonwebtoken": "^8.1.0",
+        "lodash": "^4.17.4",
         "lru-cache": "*",
-        "crypto": "*"
+        "socket.io": "1.*"
     }
 }

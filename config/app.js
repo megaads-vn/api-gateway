@@ -19,5 +19,6 @@ module.exports = {
             key: "/path/file.key",
             cert: "/path/file.crt"
         }
-    }
+    },
+    secret: "project-x"
 };
