@@ -13,6 +13,7 @@ var packageCfg = require(__dir + "/package.json");
 var loggerFactory = require(__dir + "/core/log/logger-factory");
 var serviceContainer = require(__dir + "/core/ioc-container/service-container");
 var serviceProviderRegister = require(__dir + "/config/service-providers");
+var serviceRegistry = require(__dir + "/core/loader/service-registry");
 var event = require(__dir + "/core/app/event");
 var viewEngineFactory = require(__dir + "/core/io/view/engine-factory");
 /** Exports **/
@@ -36,7 +37,8 @@ function Application() {
             httpConnection: httpConnection,
             socketIOConnection: socketIOConnection,
             sessionManager: sessionManager,
-            viewEngine: viewEngine
+            viewEngine: viewEngine,
+            serviceRegistry: serviceRegistry
         });
         // Bind registed service providers
         serviceProviderRegister(serviceContainer);
