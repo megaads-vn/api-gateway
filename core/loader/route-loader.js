@@ -10,6 +10,9 @@ var IO = require("../io/io");
 var util = require(__dir + "/core/app/util");
 var config = require(__dir + "/core/app/config");
 var contentTypes = require(__dir + "/core/io/content-types");
+var serviceRegistry = require(__dir + "/core/loader/service-registry");
+var UrlPattern = require("url-pattern");
+var request = require("request");
 /** Modules **/
 function RouteLoader() {
     this.filterContainer = [];
@@ -19,6 +22,7 @@ function RouteLoader() {
         this.httpConnection = constructorProperties.httpConnection;
         this.autoLoader = constructorProperties.autoLoader;
         this.viewEngine = constructorProperties.viewEngine;
+        this.serviceRegistry = constructorProperties.serviceRegistry;
         this.httpConnection.asset(processAssetRequest);
         this.initHTTPRoutes();
     };
@@ -28,6 +32,49 @@ function RouteLoader() {
             this[this.httpConnection.methods[i]](routeName, route, filters);
         }
         return this;
+    };
+    this.gateway = function (config) {
+        var self = this;
+        self.httpConnection[config.method](config.route, function (req, res) {
+            var io = new IO({
+                method: config.method,
+                autoLoader: self.autoLoader,
+                routeName: config.route,
+                sessionManager: self.sessionManager,
+                viewEngine: self.viewEngine
+            });
+            io.bindHttp(req, res);
+            if (config.services != null && config.services.length > 0) {
+                var requestPromisses = [];
+                for (var i = 0; i < config.services.length; i++) {
+                    var service = config.services[i];
+                    var urlPattern = new UrlPattern(service.path);
+                    if (service.method == null) {
+                        service.method = config.method;
+                    }
+                    var forwardedUrl = self.serviceRegistry.getService(service.id) + urlPattern.stringify(io.inputs);
+                    var requestPromiss = new Promise(function(resolve, reject) {
+                        var requestParams = service.method.toUpperCase() == "GET" ? {qs: io.inputs} : {form: io.inputs};
+                        request[service.method](forwardedUrl, requestParams,
+                            function(err, httpResponse, body) {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    try {
+                                        body = JSON.parse(body);
+                                    } catch (e) {}
+                                    resolve(body);
+                                }
+                            }
+                        );
+                    });
+                    requestPromisses.push(requestPromiss);
+                }
+                Promise.all(requestPromisses).then(function(values) {
+                    io.json(values);
+                });
+            }
+        });
     };
     this.io = function (routeName, action, filters) {
         var self = this;
