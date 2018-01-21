@@ -82,7 +82,37 @@ String.prototype.fileExtension = function () {
     var fileNameMap = this.toString().split(".");
     return fileNameMap.length >= 2 ? fileNameMap[fileNameMap.length - 1] : null;
 };
+Object.prototype.getProperty = function(property) {
+    property = property.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+    property = property.replace(/^\./, '');           // strip a leading dot
+    var a = property.split('.');
+    var o = this;
+    for (var i = 0, n = a.length; i < n; ++i) {
+        var k = a[i];
+        if (k in o) {
+            o = o[k];
+        } else {
+            return;
+        }
+    }
+    return o;
+}
 function Util() {
+    var routeRegex = new RegExp(/(:)([^\s/]+)/g);
+    var self = this;
+    this.getRouteParams = function (route) {
+        var retval = [];
+        while (matches = routeRegex.exec(route)) {
+            retval.push(matches[2]);
+        }
+        return retval;
+    };
+    this.fillRouteParams = function (route, params) {
+        for (var property in params) {
+            route = route.split(":" + property).join(params[property]);
+        }
+        return route;
+    };
     this.now = function () {
         var date = new Date();
         var year = date.getFullYear();

@@ -26,6 +26,7 @@ function RouteLoader() {
         this.httpConnection.asset(processAssetRequest);
         this.initHTTPRoutes();
     };
+    this.group = function () {};
     this.any = function (routeName, route, filters) {
         this.io(routeName, route, filters);
         for (var i = 0; i < this.httpConnection.methods.length; i++) {
@@ -36,6 +37,7 @@ function RouteLoader() {
     this.gateway = function (config) {
         var self = this;
         self.httpConnection[config.method](config.route, function (req, res) {
+            var retval = {};
             var io = new IO({
                 method: config.method,
                 autoLoader: self.autoLoader,
@@ -45,34 +47,47 @@ function RouteLoader() {
             });
             io.bindHttp(req, res);
             if (config.services != null && config.services.length > 0) {
-                var requestPromisses = [];
-                for (var i = 0; i < config.services.length; i++) {
-                    var service = config.services[i];
-                    var urlPattern = new UrlPattern(service.path);
-                    if (service.method == null) {
-                        service.method = config.method;
+                if (config.type == null || config.type == "parallel") {
+                    var requestPromises = [];
+                    for (var i = 0; i < config.services.length; i++) {
+                        var service = config.services[i];
+                        var requestPromise = sendGatewayPromiseRequest(service, io.inputs, config.method);
+                        requestPromises.push(requestPromise);
                     }
-                    var forwardedUrl = self.serviceRegistry.getService(service.id) + urlPattern.stringify(io.inputs);
-                    var requestPromiss = new Promise(function(resolve, reject) {
-                        var requestParams = service.method.toUpperCase() == "GET" ? {qs: io.inputs} : {form: io.inputs};
-                        request[service.method](forwardedUrl, requestParams,
-                            function(err, httpResponse, body) {
-                                if (err) {
-                                    reject(err);
-                                } else {
-                                    try {
-                                        body = JSON.parse(body);
-                                    } catch (e) {}
-                                    resolve(body);
-                                }
-                            }
-                        );
+                    Promise.all(requestPromises).then(function(values) {
+                        for (var i = 0; i < config.services.length; i++) {
+                            retval[config.services[i].return == null ? i : config.services[i].return] = values[i];
+                        }
+                        responseGatewayRequest(self, io, config, retval);
                     });
-                    requestPromisses.push(requestPromiss);
+                } else {
+                    var promisePipe;
+                    for (var i = 0; i < config.services.length; i++) {
+                        var service = config.services[i];
+                        if (i == 0) {
+                            var requestPromise = sendGatewayPromiseRequest(service, io.inputs, config.method);
+                            promisePipe = requestPromise;
+                        } else {
+                            var promisePipeClosureFn = function (service, promiseIdx) {
+                                promisePipe = promisePipe.then(function (data) {
+                                    var returnPropertype = config.services[promiseIdx].return == null ? promiseIdx : config.services[promiseIdx].return;
+                                    retval[returnPropertype] = data;
+                                    io.inputs[returnPropertype] = data;
+                                    return sendGatewayPromiseRequest(service, io.inputs, config.method, true);
+                                });
+                            };
+                            promisePipeClosureFn(service, i - 1);
+                        }
+                    }
+                    promisePipe.then(function (data) {
+                        retval[config.services[config.services.length - 1].return == null ?
+                            config.services.length - 1 : config.services[config.services.length - 1].return
+                        ] = data;
+                        responseGatewayRequest(self, io, config, retval);
+                    }).catch(function (err){
+                        responseGatewayRequest(self, io, config, {error: err});
+                    });
                 }
-                Promise.all(requestPromisses).then(function(values) {
-                    io.json(values);
-                });
             }
         });
     };
@@ -123,6 +138,52 @@ function RouteLoader() {
         this.filterContainer[name] = callbackFn;
         return this;
     };
+    function responseGatewayRequest(self, io, config, responseData) {
+        if (config.action != null) {
+            io.inputs.gateway = {};
+            for (var property in responseData) {
+                io.inputs.gateway[property] = responseData[property];
+            }
+            executeAction(self, config.action, io);
+        } else {
+            io.json(responseData);
+        }
+    }
+    function sendGatewayPromiseRequest(service, params, defaultMethod, pipe) {
+        if (service.method == null) {
+            service.method = defaultMethod;
+        }
+        var url = "";
+        if (pipe) {
+            var pipeParams = util.getRouteParams(service.path);
+            var paramValues = {};
+            for (var i = 0; i < pipeParams.length; i++) {
+                var pipeParamValue = params.getProperty(pipeParams[i]);
+                if (pipeParamValue != null) {
+                    params[pipeParams[i]] = pipeParamValue;
+                    paramValues[pipeParams[i]] = pipeParamValue;
+                }
+            }
+            service.path = util.fillRouteParams(service.path, paramValues);
+        }
+        var urlPattern = new UrlPattern(service.path);
+        url = serviceRegistry.getService(service.id) + urlPattern.stringify(params);
+        return new Promise(function(resolve, reject) {
+            var requestParams = service.method.toUpperCase() == "GET" ? {qs: params} : {form: params};
+            request[service.method](url, requestParams,
+                function(err, httpResponse, body) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        try {
+                            body = JSON.parse(body);
+                        } catch (e) {}
+                        resolve(body);
+                    }
+                }
+            );
+        });
+    }
     function executeAction(self, action, io, filters) {
         var interrupt = false;
         // call before-filter
