@@ -1,1 +1,3 @@
 storage/sessions/*
+.idea
+node_modules
