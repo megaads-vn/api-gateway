@@ -26,7 +26,8 @@ function RouteLoader() {
         this.httpConnection.asset(processAssetRequest);
         this.initHTTPRoutes();
     };
-    this.group = function () {};
+    this.group = function () {
+    };
     this.any = function (routeName, route, filters) {
         this.io(routeName, route, filters);
         for (var i = 0; i < this.httpConnection.methods.length; i++) {
@@ -54,7 +55,7 @@ function RouteLoader() {
                         var requestPromise = sendGatewayPromiseRequest(service, io.inputs, config.method);
                         requestPromises.push(requestPromise);
                     }
-                    Promise.all(requestPromises).then(function(values) {
+                    Promise.all(requestPromises).then(function (values) {
                         for (var i = 0; i < config.services.length; i++) {
                             retval[config.services[i].return == null ? i : config.services[i].return] = values[i];
                         }
@@ -70,9 +71,7 @@ function RouteLoader() {
                         } else {
                             var promisePipeClosureFn = function (service, promiseIdx) {
                                 promisePipe = promisePipe.then(function (data) {
-                                    var returnPropertype = config.services[promiseIdx].return == null ? promiseIdx : config.services[promiseIdx].return;
-                                    retval[returnPropertype] = data;
-                                    io.inputs[returnPropertype] = data;
+                                    buildReturnData(data, retval, io, config, promiseIdx);
                                     return sendGatewayPromiseRequest(service, io.inputs, config.method, true);
                                 });
                             };
@@ -80,17 +79,16 @@ function RouteLoader() {
                         }
                     }
                     promisePipe.then(function (data) {
-                        retval[config.services[config.services.length - 1].return == null ?
-                            config.services.length - 1 : config.services[config.services.length - 1].return
-                        ] = data;
+                        buildReturnData(data, retval, io, config, config.services.length - 1);
                         responseGatewayRequest(self, io, config, retval);
-                    }).catch(function (err){
+                    }).catch(function (err) {
                         responseGatewayRequest(self, io, config, {error: err});
                     });
                 }
             }
         });
     };
+
     this.io = function (routeName, action, filters) {
         var self = this;
         this.socketIOConnection.addMessageListener(routeName, function (data, session) {
@@ -149,41 +147,72 @@ function RouteLoader() {
             io.json(responseData);
         }
     }
+
     function sendGatewayPromiseRequest(service, params, defaultMethod, pipe) {
         if (service.method == null) {
             service.method = defaultMethod;
         }
+        //return sendGatewayPromiseRequest(service, io.inputs, config.method, true);
         var url = "";
+        var servicePath = service.path;
         if (pipe) {
-            var pipeParams = util.getRouteParams(service.path);
+            var pipeParams = util.getRouteParams(servicePath);
             var paramValues = {};
             for (var i = 0; i < pipeParams.length; i++) {
-                var pipeParamValue = params.getProperty(pipeParams[i]);
-                if (pipeParamValue != null) {
-                    params[pipeParams[i]] = pipeParamValue;
-                    paramValues[pipeParams[i]] = pipeParamValue;
+                var param = pipeParams[i];
+                if (service.join_from != null) {
+                    var mainTable = service.join_from;
+                    var column = service.join_column;
+                    var mainTableData = params[mainTable].data;
+                    var pipeParamValue = [];
+                    if (mainTableData.length > 0) {
+                        for (var i = 0; i < mainTableData.length; i++) {
+                            var columnValue = mainTableData[i][column];
+                            pipeParamValue.push(columnValue);
+                        }
+
+                    }else  if (typeof mainTableData == 'object') {
+                        var columnValue = mainTableData[column] != null ? mainTableData[column] : -1;
+                        pipeParamValue.push(columnValue);
+                    }
+
+                    if (pipeParamValue.length == 0) {
+                        pipeParamValue = [-1];
+                    }
+                    params = {};
+                    params[param] = pipeParamValue.join(',');
+                    paramValues[param] = pipeParamValue.join(',');
+                } else {
+                    var pipeParamValue = params.getProperty(param);
+                    if (pipeParamValue != null) {
+                        params[param] = pipeParamValue;
+                        paramValues[param] = pipeParamValue;
+                    }
                 }
+
             }
-            service.path = util.fillRouteParams(service.path, paramValues);
+            servicePath = util.fillRouteParams(servicePath, paramValues);
         }
-        var urlPattern = new UrlPattern(service.path);
+        var urlPattern = new UrlPattern(servicePath);
         url = serviceRegistry.getService(service.id) + urlPattern.stringify(params);
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var requestParams = service.method.toUpperCase() == "GET" ? {qs: params} : {form: params};
             request[service.method](url, requestParams,
-                function(err, httpResponse, body) {
+                function (err, httpResponse, body) {
                     if (err) {
                         reject(err);
                     } else {
                         try {
                             body = JSON.parse(body);
-                        } catch (e) {}
+                        } catch (e) {
+                        }
                         resolve(body);
                     }
                 }
             );
         });
     }
+
     function executeAction(self, action, io, filters) {
         var interrupt = false;
         // call before-filter
@@ -209,7 +238,6 @@ function RouteLoader() {
                     }
                 }
             }
-
         }
         // if before-filter return false, return before executing action
         if (interrupt) {
@@ -250,6 +278,7 @@ function RouteLoader() {
             }
         }
     }
+
     function processAssetRequest(req, res) {
         var result = util.readFile(__dir + config.get("app.assetPath", "") + req.baseUrl);
         if (result === false) {
@@ -268,5 +297,47 @@ function RouteLoader() {
             res.writeHead(200, header);
             res.end(result, "binary");
         }
+    }
+
+    function buildReturnData(requestResult, retval, io, config, promiseIdx) {
+        var returnPropertype = config.services[promiseIdx].return == null ? promiseIdx
+            : config.services[promiseIdx].return;
+        if (config.services[promiseIdx].join_from != null) {
+            var joinFrom = config.services[promiseIdx].join_from;
+            var joinColumn = config.services[promiseIdx].join_column;
+            var groupBuildData = groupData(requestResult);
+            if (io.inputs[joinFrom] != null) {
+                var joinFromData = io.inputs[joinFrom].data;
+                if(joinFromData.length > 0) {
+                    for (var i = 0; i < joinFromData.length; i++) {
+                        var columnValue = joinFromData[i][joinColumn];
+                        joinFromData[i][returnPropertype] = {};
+                        if (groupBuildData[columnValue] != null) {
+                            joinFromData[i][returnPropertype] = groupBuildData[columnValue];
+                        }
+                    }
+                }
+                if(typeof joinFromData == 'object') {
+                    var columnValue = joinFromData[joinColumn] != null ? joinFromData[joinColumn] : '';
+                    joinFromData[returnPropertype] = groupBuildData[columnValue];
+                }
+                io.inputs[joinFrom].data = joinFromData;
+            }
+        } else {
+            retval[returnPropertype] = requestResult;
+            io.inputs[returnPropertype] = requestResult;
+        }
+
+    }
+    function groupData(requestResult) {
+        var requestData = requestResult.data != null ? requestResult.data : [];
+        var groupData = {};
+        if (requestData != null && requestData.length > 0) {
+            for (var i = 0; i < requestData.length; i++) {
+                var item = requestData[i];
+                groupData[item.id] = item;
+            }
+        }
+        return groupData;
     }
 }
