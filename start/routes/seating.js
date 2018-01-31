@@ -2,16 +2,6 @@
  * Created by tuanpa on 1/26/18.
  */
 module.exports.init = function($route) {
-    // $route.gateway({
-    //     method: 'get',
-    //     route: '/api/seating',
-    //     services: [
-    //         {
-    //             id: 'SEATING_SERVICE',
-    //             path: '/api/seating'
-    //         }
-    //     ]
-    // });
     $route.gateway({
         method: 'get',
         route: '/api/seating',

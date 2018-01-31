@@ -16,6 +16,11 @@ function HttpServer() {
     var listeners = [];
     var sslMode = config.get("app.sslMode");
     this.server = http.createServer(function (req, res) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Max-Age', 28800);
+        res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
         onRequest(this, req, res);
     });
     if (sslMode.enable) {

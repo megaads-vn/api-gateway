@@ -1,7 +1,7 @@
 /**
  * Created by tuanpa on 1/26/18.
  */
-module.exports.init = function($route) {
+module.exports.init = function ($route) {
     $route.gateway({
         method: 'get',
         route: '/api/business',
@@ -50,8 +50,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'BUSINESS_SERVICE',
-                path: '/api/business'
-
+                path: '/api/business',
+                return: 'business'
             }
         ]
     });
@@ -61,8 +61,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'BUSINESS_SERVICE',
-                path: '/api/business/:id'
-
+                path: '/api/business/:id',
+                return: 'business'
             }
         ]
     });
@@ -72,8 +72,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'BUSINESS_SERVICE',
-                path: '/api/business/:id'
-
+                path: '/api/business/:id',
+                return: 'business'
             }
         ]
     });
