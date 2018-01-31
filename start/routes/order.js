@@ -11,14 +11,14 @@ module.exports.init = function ($route) {
                 id: 'ORDER_SERVICE',
                 path: '/api/order',
                 method: 'get',
-                return: 'orders'
+                return: 'order'
 
             },
             {
                 id: 'BUSINESS_SERVICE',
                 path: '/api/business?ids=:join_column',
                 method: 'get',
-                join_from: 'orders',
+                join_from: 'order',
                 join_column: 'business_id',
                 return: 'business'
             },
@@ -26,7 +26,7 @@ module.exports.init = function ($route) {
                 id: 'SEATING_SERVICE',
                 path: '/api/seating?ids=:join_column',
                 method: 'get',
-                join_from: 'orders',
+                join_from: 'order',
                 join_column: 'seating_id',
                 return: 'seating'
             }
@@ -41,13 +41,13 @@ module.exports.init = function ($route) {
             {
                 id: 'ORDER_SERVICE',
                 path: '/api/order/:id',
-                return: 'orders'
+                return: 'order'
             },
             {
                 id: 'BUSINESS_SERVICE',
                 path: '/api/business?ids=:join_column',
                 method: 'get',
-                join_from: 'orders',
+                join_from: 'order',
                 join_column: 'business_id',
                 return: 'business'
             },
@@ -55,7 +55,7 @@ module.exports.init = function ($route) {
                 id: 'SEATING_SERVICE',
                 path: '/api/seating?ids=:join_column',
                 method: 'get',
-                join_from: 'orders',
+                join_from: 'order',
                 join_column: 'seating_id',
                 return: 'seating'
             },
@@ -68,8 +68,8 @@ module.exports.init = function ($route) {
         services: [
             {
                 id: 'ORDER_SERVICE',
-                path: '/api/order'
-
+                path: '/api/order',
+                return: 'order'
             }
         ]
     });
@@ -79,8 +79,8 @@ module.exports.init = function ($route) {
         services: [
             {
                 id: 'ORDER_SERVICE',
-                path: '/api/order/:id'
-
+                path: '/api/order/:id',
+                return: 'order'
             }
         ]
     });
@@ -90,8 +90,8 @@ module.exports.init = function ($route) {
         services: [
             {
                 id: 'ORDER_SERVICE',
-                path: '/api/order/:id'
-
+                path: '/api/order/:id',
+                return: 'order'
             }
         ]
     });

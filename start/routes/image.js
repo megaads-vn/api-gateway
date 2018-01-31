@@ -1,5 +1,5 @@
 /**
- * Created by tuananhzippy on 1/26/18.
+ * Created by tuananhzippy on 1/31/18.
  */
 module.exports.init = function ($route) {
     $route.gateway({
@@ -8,7 +8,7 @@ module.exports.init = function ($route) {
         services: [
             {
                 id: 'IMAGE_SERVICE',
-                path: '/api/resources/*',
+                path: '/*',
                 return: 'resources'
             }
         ]

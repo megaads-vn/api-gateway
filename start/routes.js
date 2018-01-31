@@ -2,6 +2,9 @@ var OrderRoute = require('./routes/order');
 var BusinessRoute = require('./routes/business');
 var UserRoute = require('./routes/user');
 var SeatingRoute = require('./routes/seating');
+var CategoryRoute = require('./routes/category');
+var ProductRoute = require('./routes/product');
+var CustomerRoute = require('./routes/customer');
 var ImageRoute = require('./routes/image');
 module.exports = function ($route, $logger) {
     /** Register HTTP requests **/
@@ -21,5 +24,8 @@ module.exports = function ($route, $logger) {
     BusinessRoute.init($route);
     UserRoute.init($route);
     SeatingRoute.init($route);
+    CategoryRoute.init($route);
+    ProductRoute.init($route);
+    CustomerRoute.init($route);
     ImageRoute.init($route);
 };

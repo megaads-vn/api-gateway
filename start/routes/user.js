@@ -8,7 +8,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'USER_SERVICE',
-                path: '/api/user'
+                path: '/api/user',
+                return: 'user'
             }
         ]
     });
@@ -19,7 +20,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'USER_SERVICE',
-                path:  '/api/user/:id'
+                path: '/api/user/:id',
+                return: 'user'
             }
         ]
     });
@@ -30,7 +32,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'USER_SERVICE',
-                path: '/api/user'
+                path: '/api/user',
+                return: 'user'
             }
         ]
     });
@@ -40,7 +43,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'USER_SERVICE',
-                path: '/api/user/:id'
+                path: '/api/user/:id',
+                return: 'user'
             }
         ]
     });
@@ -50,7 +54,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'USER_SERVICE',
-                path: '/api/user/:id'
+                path: '/api/user/:id',
+                return: 'user'
             }
         ]
     });

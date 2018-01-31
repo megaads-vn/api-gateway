@@ -39,7 +39,20 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'SEATING_SERVICE',
-                path:  '/api/seating/:id'
+                path: '/api/seating/:id',
+                return: 'seating'
+            }
+        ]
+    });
+
+    $route.gateway({
+        method: 'get',
+        route: '/api/seating/print/:id',
+        services: [
+            {
+                id: 'SEATING_SERVICE',
+                path: '/api/seating/print/:id',
+                return: 'seating'
             }
         ]
     });
@@ -50,7 +63,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'SEATING_SERVICE',
-                path: '/api/seating'
+                path: '/api/seating',
+                return: 'seating'
             }
         ]
     });
@@ -60,7 +74,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'SEATING_SERVICE',
-                path: '/api/seating/:id'
+                path: '/api/seating/:id',
+                return: 'seating'
             }
         ]
     });
@@ -70,7 +85,8 @@ module.exports.init = function($route) {
         services: [
             {
                 id: 'SEATING_SERVICE',
-                path: '/api/seating/:id'
+                path: '/api/seating/:id',
+                return: 'seating'
             }
         ]
     });
