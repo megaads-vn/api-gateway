@@ -188,7 +188,7 @@ function RouteLoader() {
                     params[param] = pipeParamValue.join(',');
                     paramValues[param] = pipeParamValue.join(',');
                 } else {
-                    var pipeParamValue = params.getProperty(param);
+                    var pipeParamValue = util.getProperty(params, param);
                     if (pipeParamValue != null) {
                         params[param] = pipeParamValue;
                         paramValues[param] = pipeParamValue;
