@@ -82,21 +82,6 @@ String.prototype.fileExtension = function () {
     var fileNameMap = this.toString().split(".");
     return fileNameMap.length >= 2 ? fileNameMap[fileNameMap.length - 1] : null;
 };
-Object.prototype.getProperty = function(property) {
-    property = property.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
-    property = property.replace(/^\./, '');           // strip a leading dot
-    var a = property.split('.');
-    var o = this;
-    for (var i = 0, n = a.length; i < n; ++i) {
-        var k = a[i];
-        if (k in o) {
-            o = o[k];
-        } else {
-            return;
-        }
-    }
-    return o;
-}
 function Util() {
     var routeRegex = new RegExp(/(:)([^\s/]+)/g);
     var self = this;
@@ -144,6 +129,24 @@ function Util() {
         }
         return retval;
     };
+    /**
+    * Get object property by namespace string
+    * @returns {}
+    **/
+    this.getProperty = function(o, namespace) {
+        namespace = namespace.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+        namespace = namespace.replace(/^\./, '');           // strip a leading dot
+        var a = namespace.split('.');
+        for (var i = 0, n = a.length; i < n; ++i) {
+            var k = a[i];
+            if (k in o) {
+                o = o[k];
+            } else {
+                return;
+            }
+        }
+        return o;
+    }
     /**
      * Return a random string with length
      * @param {Int} length

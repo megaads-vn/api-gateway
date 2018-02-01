@@ -85,6 +85,11 @@ function RouteLoader() {
                         responseGatewayRequest(self, io, config, {error: err});
                     });
                 }
+            } else if (config.redirection != null) {
+                var urlPattern = new UrlPattern(config.redirection.path);
+                url = serviceRegistry.getService(config.redirection.id) + urlPattern.stringify(io.inputs);
+                var requestParams = config.method.toUpperCase() == "GET" ? {qs: io.inputs} : {form: io.inputs};
+                request[config.method](url, requestParams).pipe(res);
             }
         });
     };
