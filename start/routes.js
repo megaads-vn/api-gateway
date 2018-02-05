@@ -6,10 +6,27 @@ var CategoryRoute = require('./routes/category');
 var ProductRoute = require('./routes/product');
 var CustomerRoute = require('./routes/customer');
 var ImageRoute = require('./routes/image');
+
+var auth = require('../controllers/auth-controller');
+
 module.exports = function ($route, $logger) {
     /** Register HTTP requests **/
     /** Register socket.io requests **/
     /** Register filters **/
+    $route.post("/register", "HomeController@register");
+	$route.post("/sign-in", "HomeController@sign_in");
+    $route.post("/home", "HomeController@home",
+        {
+            before: ["auth", function (io) {
+                    $logger.debug("processing a download request");
+                }],
+            after: function (io) {
+                $logger.debug("finished a download request");
+            }
+        }
+    );
+
+    $route.filter("auth", auth.auth);
 
     $route.options('/*', function (io) {
         io.header('Access-Control-Allow-Origin', '*')

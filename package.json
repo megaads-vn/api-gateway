@@ -2,8 +2,19 @@
     "name": "API-Gateway",
     "description": "High performance and lightweight API Gateway with service registry",
     "homepage": "https://github.com/megaads-vn",
-    "author": "Megaads Vietnam <info@megaads.vn>",
+    "author": "Megaads <info.megaads@gmail.com>",
     "keywords": [
+        "framework",
+        "http",
+        "socket.io",
+        "mvc",
+        "lightweight",
+        "server",
+        "engine",
+        "real time",
+        "notification",
+        "chat",
+        "rest",
         "microservice",
         "api gateway",
         "service",
@@ -18,11 +29,14 @@
         "url": "git+https://github.com/megaads-vn/api-gateway"
     },
     "dependencies": {
-        "socket.io": "1.*",
-        "ejs": "2.*",
-        "lru-cache": "*",
+        "bcrypt": "^1.0.3",
         "crypto": "*",
-        "url-pattern": "1.*",
-        "request": "*"
+        "ejs": "2.*",
+        "jsonwebtoken": "^8.1.0",
+        "lodash": "^4.17.5",
+        "lru-cache": "*",
+        "request": "*",
+        "socket.io": "1.*",
+        "url-pattern": "1.*"
     }
 }
