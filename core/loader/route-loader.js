@@ -53,9 +53,11 @@ function RouteLoader() {
         }
         return this;
     };
-    
-    this.gateway = function (config) {
+    this.gateway = function (config, filters) {
         var self = this;
+        if (filters == null && self.groupFilters != null) {
+            filters = self.groupFilters;
+        }
         self.httpConnection[config.method](config.route, function (req, res) {
             var retval = {};
             var io = new IO({
@@ -66,50 +68,52 @@ function RouteLoader() {
                 viewEngine: self.viewEngine
             });
             io.bindHttp(req, res);
-            if (config.services != null && config.services.length > 0) {
-                if (config.type == null || config.type == "parallel") {
-                    var requestPromises = [];
-                    for (var i = 0; i < config.services.length; i++) {
-                        var service = config.services[i];
-                        var requestPromise = sendGatewayPromiseRequest(service, io.inputs, config.method);
-                        requestPromises.push(requestPromise);
-                    }
-                    Promise.all(requestPromises).then(function (values) {
+            executeAction(self, function() {
+                if (config.services != null && config.services.length > 0) {
+                    if (config.type == null || config.type == "parallel") {
+                        var requestPromises = [];
                         for (var i = 0; i < config.services.length; i++) {
-                            retval[config.services[i].return == null ? i : config.services[i].return] = values[i];
-                        }
-                        responseGatewayRequest(self, io, config, retval);
-                    });
-                } else {
-                    var promisePipe;
-                    for (var i = 0; i < config.services.length; i++) {
-                        var service = config.services[i];
-                        if (i == 0) {
+                            var service = config.services[i];
                             var requestPromise = sendGatewayPromiseRequest(service, io.inputs, config.method);
-                            promisePipe = requestPromise;
-                        } else {
-                            var promisePipeClosureFn = function (service, promiseIdx) {
-                                promisePipe = promisePipe.then(function (data) {
-                                    buildReturnData(data, retval, io, config, promiseIdx);
-                                    return sendGatewayPromiseRequest(service, io.inputs, config.method, true);
-                                });
-                            };
-                            promisePipeClosureFn(service, i - 1);
+                            requestPromises.push(requestPromise);
                         }
+                        Promise.all(requestPromises).then(function (values) {
+                            for (var i = 0; i < config.services.length; i++) {
+                                retval[config.services[i].return == null ? i : config.services[i].return] = values[i];
+                            }
+                            responseGatewayRequest(self, io, config, retval);
+                        });
+                    } else {
+                        var promisePipe;
+                        for (var i = 0; i < config.services.length; i++) {
+                            var service = config.services[i];
+                            if (i == 0) {
+                                var requestPromise = sendGatewayPromiseRequest(service, io.inputs, config.method);
+                                promisePipe = requestPromise;
+                            } else {
+                                var promisePipeClosureFn = function (service, promiseIdx) {
+                                    promisePipe = promisePipe.then(function (data) {
+                                        buildReturnData(data, retval, io, config, promiseIdx);
+                                        return sendGatewayPromiseRequest(service, io.inputs, config.method, true);
+                                    });
+                                };
+                                promisePipeClosureFn(service, i - 1);
+                            }
+                        }
+                        promisePipe.then(function (data) {
+                            buildReturnData(data, retval, io, config, config.services.length - 1);
+                            responseGatewayRequest(self, io, config, retval);
+                        }).catch(function (err) {
+                            responseGatewayRequest(self, io, config, {error: err});
+                        });
                     }
-                    promisePipe.then(function (data) {
-                        buildReturnData(data, retval, io, config, config.services.length - 1);
-                        responseGatewayRequest(self, io, config, retval);
-                    }).catch(function (err) {
-                        responseGatewayRequest(self, io, config, {error: err});
-                    });
+                } else if (config.redirection != null) {
+                    var urlPattern = new UrlPattern(config.redirection.path);
+                    url = serviceRegistry.getService(config.redirection.id) + urlPattern.stringify(io.inputs);
+                    var requestParams = config.method.toUpperCase() == "GET" ? {qs: io.inputs} : {form: io.inputs};
+                    request[config.method](url, requestParams).pipe(res);
                 }
-            } else if (config.redirection != null) {
-                var urlPattern = new UrlPattern(config.redirection.path);
-                url = serviceRegistry.getService(config.redirection.id) + urlPattern.stringify(io.inputs);
-                var requestParams = config.method.toUpperCase() == "GET" ? {qs: io.inputs} : {form: io.inputs};
-                request[config.method](url, requestParams).pipe(res);
-            }
+            }, io, filters);
         });
     };
 
