@@ -37,6 +37,7 @@
         "lru-cache": "*",
         "request": "*",
         "socket.io": "1.*",
-        "url-pattern": "1.*"
+        "url-pattern": "1.*",
+        "http-proxy": "*"
     }
 }

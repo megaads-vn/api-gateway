@@ -8,6 +8,8 @@ module.exports = new HttpConnection();
 /** Imports **/
 var event = require(__dir + "/core/app/event");
 var UrlPattern = require("url-pattern");
+var serviceRegistry = require(__dir + "/core/loader/service-registry");
+var proxy = require("http-proxy").createProxyServer({});
 /** Classes **/
 function HttpConnection() {
     this.methods = ["get", "post", "put", "delete", "options"];
@@ -20,48 +22,26 @@ function HttpConnection() {
         httpServer.addConnectionListener(this);
     };
     this.onConnection = function (req, res) {
-        // Fire event
-        event.fire("connection.http.request", req);
-        // Pass to listeners
-        var self = this;
-        var url = req.url;
-        if (req.method === "GET") {
-            var contentType = req.headers["content-type"];
-            var callback = getCallback.bind(this)("GET", url);
-            if (callback.fn != null) {
-                req.inputs = callback.urlInputs;
-                var inputs = getInputs(url, "GET", contentType);
-                for (var property in inputs) {
-                    req.inputs[property] = inputs[property];
-                }
-                req.baseUrl = getBaseUrl(url);
-                callback.fn(req, res, url);
-            } else {
-                res.writeHead(404, {"Content-Type": "application/json"});
-                res.end(JSON.stringify({
-                    status: 404,
-                    result: "page not found"
-                }));
-            }
+        if (req.url.indexOf("/api/upload/") == 0 && req.method !== "GET") {
+            req.url = req.url.replace("/api", "");
+            proxy.web(req, res, { target: serviceRegistry.getService("IMAGE_SERVICE") });
         } else {
-            var body = "";
-            var contentType = req.headers["content-type"];
-            req.on("data", function (data) {
-                body += data;
-                // Too much POST data, close the connection!
-                if (body.length > 1e6)
-                    req.connection.destroy();
-            });
-            req.on("end", function () {
-                var callback = getCallback.bind(self)(req.method, url);
+            // Fire event
+            event.fire("connection.http.request", req);
+            // Pass to listeners
+            var self = this;
+            var url = req.url;
+            if (req.method === "GET") {
+                var contentType = req.headers["content-type"];
+                var callback = getCallback.bind(this)("GET", url);
                 if (callback.fn != null) {
                     req.inputs = callback.urlInputs;
-                    var inputs = getInputs(body, req.method, contentType);
+                    var inputs = getInputs(url, "GET", contentType);
                     for (var property in inputs) {
                         req.inputs[property] = inputs[property];
                     }
                     req.baseUrl = getBaseUrl(url);
-                    callback.fn(req, res);
+                    callback.fn(req, res, url);
                 } else {
                     res.writeHead(404, {"Content-Type": "application/json"});
                     res.end(JSON.stringify({
@@ -69,7 +49,34 @@ function HttpConnection() {
                         result: "page not found"
                     }));
                 }
-            });
+            } else {
+                var body = "";
+                var contentType = req.headers["content-type"];
+                req.on("data", function (data) {
+                    body += data;
+                    // Too much POST data, close the connection!
+                    if (body.length > 1e6)
+                        req.connection.destroy();
+                });
+                req.on("end", function () {
+                    var callback = getCallback.bind(self)(req.method, url);
+                    if (callback.fn != null) {
+                        req.inputs = callback.urlInputs;
+                        var inputs = getInputs(body, req.method, contentType);
+                        for (var property in inputs) {
+                            req.inputs[property] = inputs[property];
+                        }
+                        req.baseUrl = getBaseUrl(url);
+                        callback.fn(req, res);
+                    } else {
+                        res.writeHead(404, {"Content-Type": "application/json"});
+                        res.end(JSON.stringify({
+                            status: 404,
+                            result: "page not found"
+                        }));
+                    }
+                });
+            }
         }
     };
     this.initRequestCallbacks = function() {
