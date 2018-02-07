@@ -22,9 +22,8 @@ function HttpConnection() {
         httpServer.addConnectionListener(this);
     };
     this.onConnection = function (req, res) {
-        if (req.url.indexOf("/api/upload/") == 0 && req.method !== "GET") {
-            req.url = req.url.replace("/api", "");
-            proxy.web(req, res, { target: serviceRegistry.getService("IMAGE_SERVICE") });
+        if (req.url.indexOf("/api/upload/") == 0 || req.url.indexOf("/api/resources/") == 0 ) {
+            proxy.web(req, res, { target: "http://projectx-data-services.dev/" });
         } else {
             // Fire event
             event.fire("connection.http.request", req);

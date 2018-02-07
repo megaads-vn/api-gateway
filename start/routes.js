@@ -47,19 +47,6 @@ module.exports = function ($route, $logger) {
         action: "AuthController@signUp"
     });
 
-    /* Get Resource */
-    $route.gateway({
-        method: 'get',
-        route: '/api/resources/*',
-        services: [
-            {
-                id: 'IMAGE_SERVICE',
-                path: '/*',
-                return: 'resources'
-            }
-        ]
-    });
-
     $route.group(function () {
         OrderRoute.init($route);
         BusinessRoute.init($route);

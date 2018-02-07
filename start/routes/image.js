@@ -2,6 +2,9 @@
  * Created by tuananhzippy on 1/31/18.
  */
 module.exports.init = function ($route) {
+
+    /*
+
     $route.gateway({
         method: 'get',
         route: '/api/resources/*',
@@ -13,7 +16,7 @@ module.exports.init = function ($route) {
             }
         ]
     });
-    /*
+
     $route.gateway({
         method: 'post',
         route: '/api/upload/images',
