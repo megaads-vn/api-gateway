@@ -3,7 +3,7 @@
  */
 module.exports.init = function ($route) {
 
-        $route.gateway({
+    $route.gateway({
             method: 'get',
             route: '/api/business',
             type: "pipe",

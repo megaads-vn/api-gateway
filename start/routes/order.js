@@ -29,6 +29,14 @@ module.exports.init = function ($route) {
                 join_from: 'order',
                 join_column: 'seating_id',
                 return: 'seating'
+            },
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer?ids=:join_column',
+                method: 'get',
+                join_from: 'order',
+                join_column: 'customer_id',
+                return: 'customer'
             }
         ]
     });
@@ -59,6 +67,14 @@ module.exports.init = function ($route) {
                 join_column: 'seating_id',
                 return: 'seating'
             },
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer?ids=:join_column',
+                method: 'get',
+                join_from: 'order',
+                join_column: 'customer_id',
+                return: 'customer'
+            }
         ]
     });
 
