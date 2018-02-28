@@ -20,5 +20,6 @@ module.exports = {
             cert: "/path/file.crt"
         }
     },
-    secret: "project-x"
+    secret: "project-x",
+    serviceUrl: "http://projectx-data-services.dev"
 };
