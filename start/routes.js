@@ -59,10 +59,10 @@ module.exports = function ($route, $logger) {
     },
     {
         before: ["auth", function (io) {
-            $logger.debug("processing a download request");
+            // $logger.debug("processing a download request");
             }],
         after: function (io) {
-            $logger.debug("finished a download request");
+            // $logger.debug("finished a download request");
         }
     });
 
