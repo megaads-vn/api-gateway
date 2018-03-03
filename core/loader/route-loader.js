@@ -104,6 +104,7 @@ function RouteLoader() {
                             buildReturnData(data, retval, io, config, config.services.length - 1);
                             responseGatewayRequest(self, io, config, retval);
                         }).catch(function (err) {
+                            console.log(err);
                             responseGatewayRequest(self, io, config, {error: err});
                         });
                     }
@@ -210,7 +211,7 @@ function RouteLoader() {
                     var column = service.join_column;
                     var mainTableData = params[mainTable].data;
                     var pipeParamValue = [];
-                    if (mainTableData.length > 0) {
+                    if (typeof mainTableData == "array" && mainTableData.length > 0) {
                         for (var i = 0; i < mainTableData.length; i++) {
                             var columnValue = mainTableData[i][column];
                             pipeParamValue.push(columnValue);
@@ -353,7 +354,7 @@ function RouteLoader() {
             var groupBuildData = groupData(requestResult);
             if (io.inputs[joinFrom] != null) {
                 var joinFromData = io.inputs[joinFrom].data;
-                if(joinFromData.length > 0) {
+                if(typeof joinFromData == "array" && joinFromData.length > 0) {
                     for (var i = 0; i < joinFromData.length; i++) {
                         var columnValue = joinFromData[i][joinColumn];
                         joinFromData[i][returnPropertype] = {};
