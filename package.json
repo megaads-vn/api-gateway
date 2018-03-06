@@ -39,6 +39,6 @@
         "socket.io": "1.*",
         "url-pattern": "1.*",
         "http-proxy": "*",
-        "amqplib": "^0.5.2",
+        "amqplib": "^0.5.2"
     }
 }
