@@ -10,6 +10,7 @@ var event = require(__dir + "/core/app/event");
 var UrlPattern = require("url-pattern");
 var serviceRegistry = require(__dir + "/core/loader/service-registry");
 var proxy = require("http-proxy").createProxyServer({});
+var config = require(__dir + "/core/app/config");
 /** Classes **/
 function HttpConnection() {
     this.methods = ["get", "post", "put", "delete", "options"];
@@ -23,7 +24,7 @@ function HttpConnection() {
     };
     this.onConnection = function (req, res) {
         if (req.url.indexOf("/api/upload/") == 0 || req.url.indexOf("/api/resources/") == 0 ) {
-            proxy.web(req, res, { target: "http://projectx-data-services.dev/" });
+            proxy.web(req, res, { target: config.get("app.serviceUrl") + "/" });
         } else {
             // Fire event
             event.fire("connection.http.request", req);
