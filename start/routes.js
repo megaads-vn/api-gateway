@@ -6,6 +6,8 @@ var CategoryRoute = require('./routes/category');
 var ProductRoute = require('./routes/product');
 var CustomerRoute = require('./routes/customer');
 var ImageRoute = require('./routes/image');
+var OrderItem = require('./routes/order_item');
+var GroupItem = require('./routes/group_item');
 
 var Auth = require('../controllers/AuthController');
 
@@ -46,7 +48,6 @@ module.exports = function ($route, $logger) {
         ],
         action: "AuthController@signUp"
     });
-
     $route.group(function () {
         OrderRoute.init($route);
         BusinessRoute.init($route);
@@ -56,6 +57,8 @@ module.exports = function ($route, $logger) {
         ProductRoute.init($route);
         CustomerRoute.init($route);
         ImageRoute.init($route);
+        GroupItem.init($route);
+        OrderItem.init($route);
     },
     {
         before: ["auth", function (io) {

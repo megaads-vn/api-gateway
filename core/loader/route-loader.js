@@ -209,6 +209,7 @@ function RouteLoader() {
                     var mainTable = service.join_from;
                     var column = service.join_column;
                     var mainTableData = params[mainTable].data;
+
                     var pipeParamValue = [];
                     if (mainTableData.length > 0) {
                         for (var i = 0; i < mainTableData.length; i++) {
@@ -220,7 +221,6 @@ function RouteLoader() {
                         var columnValue = mainTableData[column] != null ? mainTableData[column] : -1;
                         pipeParamValue.push(columnValue);
                     }
-
                     if (pipeParamValue.length == 0) {
                         pipeParamValue = [-1];
                     }
@@ -359,6 +359,18 @@ function RouteLoader() {
                         joinFromData[i][returnPropertype] = {};
                         if (groupBuildData[columnValue] != null) {
                             joinFromData[i][returnPropertype] = groupBuildData[columnValue];
+                        }else {
+                            var columnValueArr = columnValue.split(',');
+                            if(columnValueArr.length > 1) {
+                                joinFromData[i][returnPropertype] = [];
+                                for (var x = 0; x < columnValueArr.length; x++) {
+                                    var columnValueTmp = columnValueArr[x];
+                                    if (groupBuildData[columnValueTmp] != null) {
+                                        joinFromData[i][returnPropertype].push(groupBuildData[columnValueTmp]);
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
