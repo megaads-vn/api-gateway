@@ -5,7 +5,8 @@ module.exports = {
     autoload: [
         "/controllers",
         "/entities",
-        "/start"
+        "/start",
+        "/services",
     ],
     assetPath: "/assets",
     encryption: {
@@ -20,6 +21,7 @@ module.exports = {
             cert: "/path/file.crt"
         }
     },
+    serviceToken: "xLhkjyKa",
     secret: "project-x",
     serviceUrl: "http://projectx-data-services.dev"
 };
