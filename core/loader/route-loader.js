@@ -104,7 +104,6 @@ function RouteLoader() {
                             buildReturnData(data, retval, io, config, config.services.length - 1);
                             responseGatewayRequest(self, io, config, retval);
                         }).catch(function (err) {
-                            console.log(err);
                             responseGatewayRequest(self, io, config, {error: err});
                         });
                     }
@@ -207,21 +206,28 @@ function RouteLoader() {
             for (var i = 0; i < pipeParams.length; i++) {
                 var param = pipeParams[i];
                 if (service.join_from != null) {
-                    var mainTable = service.join_from;
                     var column = service.join_column;
+                    var joinFromArr = service.join_from.split('.');
+                    var mainTable = joinFromArr[0];
                     var mainTableData = params[mainTable].data;
                     var pipeParamValue = [];
-                    if (typeof joinFromData === "object" && mainTableData.length > 0) {
+                    if (mainTableData.id != null &&  mainTableData == 'object') {
+                        var columnValue = mainTableData[column] != null ? mainTableData[column] : -1;
+                        if(joinFromArr.length == 2) {
+                            columnValue = columnValue[joinFromArr[1]] || -1;
+                        }
+                        pipeParamValue.push(columnValue);
+                    } else if (mainTableData.length > 0) {
                         for (var i = 0; i < mainTableData.length; i++) {
-                            var columnValue = mainTableData[i][column];
+                            var columnValue = '';
+                            if(joinFromArr.length == 1) {
+                                columnValue = mainTableData[i][column] ||  -1;
+                            } else {
+                                columnValue = mainTableData[i][joinFromArr[1]][column] || -1;
+                            }
                             pipeParamValue.push(columnValue);
                         }
-
-                    }else  if (typeof mainTableData == 'object') {
-                        var columnValue = mainTableData[column] != null ? mainTableData[column] : -1;
-                        pipeParamValue.push(columnValue);
                     }
-
                     if (pipeParamValue.length == 0) {
                         pipeParamValue = [-1];
                     }
@@ -258,6 +264,7 @@ function RouteLoader() {
             );
         });
     }
+    
 
     function executeAction(self, action, io, filters) {
         var interrupt = false;
@@ -350,20 +357,42 @@ function RouteLoader() {
             : config.services[promiseIdx].return;
         if (config.services[promiseIdx].join_from != null) {
             var joinFrom = config.services[promiseIdx].join_from;
+            var joinFromArr = config.services[promiseIdx].join_from.split('.');
+            if(joinFromArr.length > 1) {
+                joinFrom = joinFromArr[0];
+            }
             var joinColumn = config.services[promiseIdx].join_column;
             var groupBuildData = groupData(requestResult);
             if (io.inputs[joinFrom] != null) {
                 var joinFromData = io.inputs[joinFrom].data;
-                if(typeof joinFromData === "object" && joinFromData.length > 0) {
+                if(joinFromData.length > 0) {
                     for (var i = 0; i < joinFromData.length; i++) {
-                        var columnValue = joinFromData[i][joinColumn];
+                        if(joinFromArr.length > 1) {
+                            var columnValue = joinFromData[i][joinFromArr[1]][joinColumn] || -1;
+                        } else {
+                            var columnValue = joinFromData[i][joinColumn] || -1;
+                        }
                         joinFromData[i][returnPropertype] = {};
                         if (groupBuildData[columnValue] != null) {
                             joinFromData[i][returnPropertype] = groupBuildData[columnValue];
+                        } else {
+                            var columnValueArr = [columnValue];
+                            if(typeof  columnValue == 'string') {
+                                columnValueArr = columnValue.split(',');
+                            }
+                            if(columnValueArr.length > 1) {
+                                joinFromData[i][returnPropertype] = [];
+                                for (var x = 0; x < columnValueArr.length; x++) {
+                                    var columnValueTmp = columnValueArr[x];
+                                    if (groupBuildData[columnValueTmp] != null) {
+                                        joinFromData[i][returnPropertype].push(groupBuildData[columnValueTmp]);
+                                    }
+                                }
+                            }
+
                         }
                     }
-                }
-                if(typeof joinFromData == 'object') {
+                } else if(typeof joinFromData == 'object') {
                     var columnValue = joinFromData[joinColumn] != null ? joinFromData[joinColumn] : '';
                     joinFromData[returnPropertype] = groupBuildData[columnValue];
                 }
