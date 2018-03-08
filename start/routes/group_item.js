@@ -44,4 +44,16 @@ module.exports.init = function ($route) {
         ]
     });
 
+    $route.gateway({
+        method: 'post',
+        route: '/api/seperate-item/:id',
+        services: [
+            {
+                id: 'GROUP_ITEM_SERVICE',
+                path: '/api/seperate-item/:id',
+                return: 'group_item'
+            }
+        ]
+    });
+
 };
