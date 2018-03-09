@@ -101,12 +101,12 @@ module.exports.init = function ($route) {
         ]
     });
     $route.gateway({
-        method: 'put',
-        route: '/api/order/update_status/:id',
+        method: 'patch',
+        route: '/api/order/:id',
         services: [
             {
                 id:'ORDER_SERVICE',
-                path: '/api/order/update_status/:id',
+                path: '/api/order/:id',
                 return: 'order'
             }
         ]
