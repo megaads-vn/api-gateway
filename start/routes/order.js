@@ -101,6 +101,17 @@ module.exports.init = function ($route) {
         ]
     });
     $route.gateway({
+        method: 'put',
+        route: '/api/order/update_status/:id',
+        services: [
+            {
+                id:'ORDER_SERVICE',
+                path: '/api/order/update_status/:id',
+                return: 'order'
+            }
+        ]
+    });
+    $route.gateway({
         method: 'delete',
         route: '/api/order/:id',
         services: [
