@@ -46,4 +46,16 @@ module.exports.init = function ($route) {
         ]
     });
 
+    $route.gateway({
+        method: 'patch',
+        route: '/api/order-item/:id',
+        services: [
+            {
+                id:'ORDER_ITEM_SERVICE',
+                path: '/api/order-item/:id',
+                return: 'order-item'
+            }
+        ]
+    });
+
 };
