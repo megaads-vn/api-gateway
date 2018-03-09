@@ -46,11 +46,11 @@ module.exports.init = function ($route) {
 
     $route.gateway({
         method: 'post',
-        route: '/api/seperate-item/:id',
+        route: '/api/group-item/seperate-item/:id',
         services: [
             {
                 id: 'GROUP_ITEM_SERVICE',
-                path: '/api/seperate-item/:id',
+                path: '/api/group-item/seperate-item/:id',
                 return: 'group_item'
             }
         ]
