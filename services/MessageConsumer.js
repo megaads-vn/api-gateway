@@ -23,9 +23,7 @@ function MessageConsumer($config, $logger, $socketIOConnection) {
 
     this.consume = function(routingKey, message) {
         $logger.debug("Consuming message: " + routingKey, message);
-        if (routingKey.indexOf("data.order.") == 0) {
-            $socketIOConnection.sendMessageToFilteredSessions({"business_id": message.business_id}, routingKey, message);
-        }
+        $socketIOConnection.broadcastMessage(routingKey, message);
     };
 
     this.listen();
