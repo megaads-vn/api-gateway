@@ -48,6 +48,31 @@ module.exports = function ($route, $logger) {
         ],
         action: "AuthController@signUp"
     });
+
+    /* Activity */
+    $route.gateway({
+        method: 'get',
+        route: '/api/forgot-password',
+        services: [
+            {
+                id: 'USER_SERVICE',
+                path: '/api/user/forgot-password',
+                return: 'user'
+            }
+        ]
+    });
+    $route.gateway({
+        method: 'get',
+        route: '/api/verify-password',
+        services: [
+            {
+                id: 'USER_SERVICE',
+                path: '/api/user/verify-password',
+                return: 'user'
+            }
+        ]
+    });
+
     $route.group(function () {
         OrderRoute.init($route);
         BusinessRoute.init($route);
