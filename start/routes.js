@@ -6,6 +6,8 @@ var CategoryRoute = require('./routes/category');
 var ProductRoute = require('./routes/product');
 var CustomerRoute = require('./routes/customer');
 var ImageRoute = require('./routes/image');
+var OrderItem = require('./routes/order_item');
+var GroupItem = require('./routes/group_item');
 
 var Auth = require('../controllers/AuthController');
 
@@ -15,7 +17,7 @@ module.exports = function ($route, $logger) {
         io.header('Access-Control-Allow-Origin', '*')
             .header('Access-Control-Allow-Credentials', 'true')
             .header('Access-Control-Max-Age', 28800)
-            .header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE')
+            .header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE, PATCH')
             .header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization')
             .echo("");
     });
@@ -80,13 +82,15 @@ module.exports = function ($route, $logger) {
         ProductRoute.init($route);
         CustomerRoute.init($route);
         ImageRoute.init($route);
+        GroupItem.init($route);
+        OrderItem.init($route);
     },
     {
         before: ["auth", function (io) {
-            // $logger.debug("processing a download request");
+            $logger.debug("processing a download request");
             }],
         after: function (io) {
-            // $logger.debug("finished a download request");
+            $logger.debug("finished a download request");
         }
     });
 

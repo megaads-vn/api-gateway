@@ -210,6 +210,7 @@ function RouteLoader() {
                     var joinFromArr = service.join_from.split('.');
                     var mainTable = joinFromArr[0];
                     var mainTableData = params[mainTable].data;
+
                     var pipeParamValue = [];
                     if (mainTableData.id != null &&  mainTableData == 'object') {
                         var columnValue = mainTableData[column] != null ? mainTableData[column] : -1;
@@ -264,7 +265,7 @@ function RouteLoader() {
             );
         });
     }
-    
+
 
     function executeAction(self, action, io, filters) {
         var interrupt = false;
