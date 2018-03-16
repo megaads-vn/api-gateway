@@ -18,7 +18,7 @@ module.exports = function ($route, $logger) {
             .header('Access-Control-Allow-Credentials', 'true')
             .header('Access-Control-Max-Age', 28800)
             .header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, DELETE, PATCH')
-            .header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization')
+            .header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization, X-XSRF-TOKEN, Role-User')
             .echo("");
     });
 
@@ -72,6 +72,57 @@ module.exports = function ($route, $logger) {
             }
         ]
     });
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/sign-in',
+        services: [
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer/sign-in',
+                return: 'user'
+            }
+        ],
+        action: "AuthController@signIn"
+    });
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/facebook',
+        services: [
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer/facebook',
+                return: 'user'
+            }
+        ],
+        action: "AuthController@signIn"
+    });
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/google',
+        services: [
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer/google',
+                return: 'user'
+            }
+        ],
+        action: "AuthController@signIn"
+    });
+
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/sign-up',
+        services: [
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer/sign-up',
+                return: 'user'
+            }
+        ],
+        action: "AuthController@signUp"
+    });
+
+
 
     $route.group(function () {
         OrderRoute.init($route);

@@ -212,7 +212,10 @@ function RouteLoader() {
                     var mainTableData = params[mainTable].data;
 
                     var pipeParamValue = [];
-                    if (mainTableData.id != null &&  mainTableData == 'object') {
+                    if (!mainTableData) {
+                        continue;
+                    }
+                    if (mainTableData.id != null) {
                         var columnValue = mainTableData[column] != null ? mainTableData[column] : -1;
                         if(joinFromArr.length == 2) {
                             columnValue = columnValue[joinFromArr[1]] || -1;

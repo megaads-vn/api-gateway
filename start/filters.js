@@ -13,7 +13,11 @@ module.exports = function ($route, $config) {
                 && io.request.headers.authorization.split(' ')[0] === 'JWT'){
             try {
                 var decoded = jwt.verify(io.request.headers.authorization.split(' ')[1], $config.get('app.secret'));
-                io.inputs.creator_id = decoded.id;
+                if(typeof io.request.headers['role-user'] !== "undefined" && io.request.headers['role-user'] == "Customer"){
+                    io.inputs.customer_id = decoded.id;
+                }else{
+                    io.inputs.creator_id = decoded.id;
+                }
                 result = true;
             } catch(err) {}
         }

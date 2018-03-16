@@ -23,7 +23,19 @@ module.exports.init = function ($route) {
             }
         ]
     });
-
+    $route.gateway({
+        method: 'get',
+        route: '/api/order-item/:id',
+        type: "pipe",
+        services: [
+            {
+                id: 'ORDER_ITEM_SERVICE',
+                path: '/api/order-item/:id',
+                method: 'get',
+                return: 'order_item'
+            }
+        ]
+    });
     $route.gateway({
         method: 'get',
         route: '/api/get-cook',
@@ -53,6 +65,18 @@ module.exports.init = function ($route) {
             {
                 id:'ORDER_ITEM_SERVICE',
                 path: '/api/order-item/:id',
+                return: 'order-item'
+            }
+        ]
+    });
+
+    $route.gateway({
+        method: 'post',
+        route: '/api/order-item',
+        services: [
+            {
+                id: 'ORDER_ITEM_SERVICE',
+                path: '/api/order-item',
                 return: 'order-item'
             }
         ]
