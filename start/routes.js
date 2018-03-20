@@ -122,6 +122,42 @@ module.exports = function ($route, $logger) {
         action: "AuthController@signUp"
     });
 
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/forgot-password',
+        services: [
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer/forgot-password',
+                return: 'user'
+            }
+        ]
+    });
+
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/verify-password',
+        services: [
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer/verify-password',
+                return: 'user'
+            }
+        ]
+    });
+
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/reset-password',
+        services: [
+            {
+                id: 'CUSTOMER_SERVICE',
+                path: '/api/customer/reset-password',
+                return: 'user'
+            }
+        ]
+    });
+
 
 
     $route.group(function () {
