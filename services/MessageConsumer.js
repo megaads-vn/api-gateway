@@ -1,4 +1,6 @@
 var amqp = require('amqplib/callback_api');
+var pushNoti = require('../controllers/PushNotificationController');
+
 module.exports = MessageConsumer;
 
 function MessageConsumer($config, $logger, $socketIOConnection) {
@@ -24,6 +26,16 @@ function MessageConsumer($config, $logger, $socketIOConnection) {
     this.consume = function(routingKey, message) {
         $logger.debug("Consuming message: " + routingKey, message);
         $socketIOConnection.broadcastMessage(routingKey, message);
+        var data = JSON.parse(message);
+        if(routingKey == "data.order.updated"){
+            if(typeof data.status !== "undefined" && typeof data.device_id !== "undefined" && data.device_id !== null){
+                pushNoti.pushOrderStatus(data);
+            }
+        }else if(routingKey = "data.order_item.updated"){
+            if(typeof data.status !== "undefined"){
+                pushNoti.pushOrderItemStatus(data);
+            }
+        }
     };
 
     this.listen();
