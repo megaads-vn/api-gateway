@@ -31,7 +31,7 @@ function MessageConsumer($config, $logger, $socketIOConnection) {
             if(typeof data.status !== "undefined" && typeof data.device_id !== "undefined" && data.device_id !== null){
                 pushNoti.pushOrderStatus(data);
             }
-        }else if(routingKey = "data.order_item.updated"){
+        }else if(routingKey == "data.order_item.updated"){
             if(typeof data.status !== "undefined"){
                 pushNoti.pushOrderItemStatus(data);
             }

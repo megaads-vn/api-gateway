@@ -64,10 +64,10 @@ function PushNotificationController() {
                     json: true,   // <--Very important!!!
                     body: myJSONObject
                 }, function (error, response, body){
-                    console.log(body);
+                    // console.log(body);
                 });
             }
-            console.log(body);
+            // console.log(body);
         });
     }
 }
