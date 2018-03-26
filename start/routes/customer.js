@@ -54,6 +54,30 @@ module.exports.init = function ($route) {
     });
 
     $route.gateway({
+        method: 'patch',
+        route: '/api/customer/:id',
+        services: [
+            {
+                id:'ORDER_SERVICE',
+                path: '/api/customer/:id',
+                return: 'customer'
+            }
+        ]
+    });
+
+    $route.gateway({
+        method: 'post',
+        route: '/api/customer/change-password',
+        services: [
+            {
+                id:'ORDER_SERVICE',
+                path: '/api/customer/change-password',
+                return: 'customer'
+            }
+        ]
+    });
+
+    $route.gateway({
         method: 'delete',
         route: '/api/customer/:id',
         services: [
