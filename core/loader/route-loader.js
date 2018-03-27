@@ -103,8 +103,8 @@ function RouteLoader() {
                         promisePipe.then(function (data) {
                             buildReturnData(data, retval, io, config, config.services.length - 1);
                             responseGatewayRequest(self, io, config, retval);
-                        }).catch(function (err) {
-                            responseGatewayRequest(self, io, config, {error: "sdsd"});
+                        }).catch(function (exception) {
+                            responseGatewayRequest(self, io, config, {error: exception});
                         });
                     }
                 } else if (config.redirection != null) {
