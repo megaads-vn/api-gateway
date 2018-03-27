@@ -104,7 +104,7 @@ function RouteLoader() {
                             buildReturnData(data, retval, io, config, config.services.length - 1);
                             responseGatewayRequest(self, io, config, retval);
                         }).catch(function (err) {
-                            responseGatewayRequest(self, io, config, {error: err});
+                            responseGatewayRequest(self, io, config, {error: "sdsd"});
                         });
                     }
                 } else if (config.redirection != null) {
@@ -369,7 +369,7 @@ function RouteLoader() {
             var groupBuildData = groupData(requestResult);
             if (io.inputs[joinFrom] != null) {
                 var joinFromData = io.inputs[joinFrom].data;
-                if(joinFromData.length > 0) {
+                if (joinFromData != null && joinFromData.length > 0) {
                     for (var i = 0; i < joinFromData.length; i++) {
                         if(joinFromArr.length > 1) {
                             var columnValue = joinFromData[i][joinFromArr[1]][joinColumn] || -1;
