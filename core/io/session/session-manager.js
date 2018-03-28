@@ -72,12 +72,9 @@ function SessionManager() {
         return retval;
     };
     this.initSocketIOSession = function (socket) {
-        var retval = {
-            type: "socket.io"
-        };
-        var userId = socket.handshake.query.userId;
+        var retval = socket.handshake.query;
+        retval.type = "socket.io";
         retval.id = socket.id;
-        retval.userId = userId;
         retval.socket = socket;
         retval.lastActive = Date.now();
         if (socket.handshake.query.extra != null) {
