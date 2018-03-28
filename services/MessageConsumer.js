@@ -25,14 +25,23 @@ function MessageConsumer($config, $logger, $socketIOConnection) {
 
     this.consume = function(routingKey, message) {
         $logger.debug("Consuming message: " + routingKey, message);
-        $socketIOConnection.broadcastMessage(routingKey, message);
         var data = JSON.parse(message);
-        if(routingKey == "data.order.updated"){
-            if(typeof data.status !== "undefined" && typeof data.device_id !== "undefined" && data.device_id !== null){
+        if (routingKey == "data.order.created"
+            || routingKey == "data.order.updated"
+            || routingKey == "data.order.deleted"
+            || routingKey == "data.order_item.created"
+            || routingKey == "data.order_item.updated"
+            || routingKey == "data.order_item.deleted") {
+            $socketIOConnection.sendMessageToFilteredSessions({"business_id": data.business_id}, routingKey, message);
+            }
+        if (routingKey == "data.order.updated") {
+            if (typeof data.status !== "undefined"
+                && typeof data.device_id !== "undefined"
+                && data.device_id !== null) {
                 pushNoti.pushOrderStatus(data);
             }
-        }else if(routingKey == "data.order_item.updated"){
-            if(typeof data.status !== "undefined"){
+        } else if (routingKey == "data.order_item.updated") {
+            if (typeof data.status !== "undefined") {
                 pushNoti.pushOrderItemStatus(data);
             }
         }
