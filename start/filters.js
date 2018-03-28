@@ -15,7 +15,7 @@ module.exports = function ($route, $config) {
                 var decoded = jwt.verify(io.request.headers.authorization.split(' ')[1], $config.get('app.secret'));
                 if(typeof io.request.headers['role-user'] !== "undefined" && io.request.headers['role-user'] == "Customer"){
                     io.inputs.customer_id = decoded.id;
-                }else{
+                } else {
                     io.inputs.creator_id = decoded.id;
                 }
                 result = true;

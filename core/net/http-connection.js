@@ -153,7 +153,7 @@ function HttpConnection() {
                 inputString = "?" + inputString;
             }
             try {
-                inputString = decodeURIComponent(inputString);
+                inputString = decodeURIComponent(inputString.replace(/\+/g, '%20'));
                 inputString.replace(/[?&]+([^=&]+)=([^&]*)/gi,
                      function (m, key, value) {
                          retval[key] = value;
