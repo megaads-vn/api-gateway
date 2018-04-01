@@ -46,17 +46,17 @@ module.exports.init = function ($route) {
             //     join_column: 'creator_id',
             //     return: 'creator_business'
             // },
-            // {
-            //     id: 'PRODUCT_SERVICE',
-            //     path: '/api/product?ids=:join_column',
-            //     method: 'get',
-            //     join_from: 'order.items',
-            //     join_column: 'product_id',
-            //     return: 'product'
-            // }
+            {
+                id: 'PRODUCT_SERVICE',
+                path: '/api/product?ids=:join_column',
+                method: 'get',
+                join_from: 'order.items',
+                join_column: 'product_id',
+                return: 'product'
+            }
         ]
     });
-    
+
 
     $route.gateway({
         method: 'get',
@@ -100,14 +100,14 @@ module.exports.init = function ($route) {
             //     join_column: 'creator_id',
             //     return: 'creator_business'
             // },
-            // {
-            //     id: 'PRODUCT_SERVICE',
-            //     path: '/api/product?ids=:join_column',
-            //     method: 'get',
-            //     join_from: 'order.items',
-            //     join_column: 'product_id',
-            //     return: 'product'
-            // }
+            {
+                id: 'PRODUCT_SERVICE',
+                path: '/api/product?ids=:join_column',
+                method: 'get',
+                join_from: 'order.items',
+                join_column: 'product_id',
+                return: 'product'
+            }
         ]
     });
 
