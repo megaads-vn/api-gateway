@@ -13,4 +13,5 @@ module.exports = function ($serviceRegistry) {
     $serviceRegistry.register("TEST_SERVICE", config.get("app.serviceUrl"));
     $serviceRegistry.register("ORDER_ITEM_SERVICE", config.get("app.serviceUrl"));
     $serviceRegistry.register("GROUP_ITEM_SERVICE", config.get("app.serviceUrl"));
+    $serviceRegistry.register("NOTIFICATION_SERVICE", config.get("app.serviceUrl"));
 };

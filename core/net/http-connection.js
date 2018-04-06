@@ -146,7 +146,7 @@ function HttpConnection() {
     }
     function getInputs(inputString, method, contentType) {
         var retval = {};
-        if (contentType != null && contentType.indexOf("json") > 0) {
+        if (contentType != null && inputString!= null && inputString != "" && contentType.indexOf("json") > 0) {
             retval = JSON.parse(inputString);
         } else {
             if (method !== "GET") {

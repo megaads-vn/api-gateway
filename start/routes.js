@@ -8,6 +8,7 @@ var CustomerRoute = require('./routes/customer');
 var ImageRoute = require('./routes/image');
 var OrderItem = require('./routes/order_item');
 var GroupItem = require('./routes/group_item');
+var NotificationRoute = require('./routes/notification');
 
 var Auth = require('../controllers/AuthController');
 var Activity = require('./activity');
@@ -36,6 +37,7 @@ module.exports = function ($route, $logger) {
         ImageRoute.init($route);
         GroupItem.init($route);
         OrderItem.init($route);
+        NotificationRoute.init($route);
     },
     {
         before: ["auth", function (io) {
