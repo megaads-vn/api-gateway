@@ -103,8 +103,9 @@ function RouteLoader() {
                         promisePipe.then(function (data) {
                             buildReturnData(data, retval, io, config, config.services.length - 1);
                             responseGatewayRequest(self, io, config, retval);
-                        }).catch(function (exception) {
-                            responseGatewayRequest(self, io, config, {error: exception});
+
+                        }).catch(function (err) {
+                            responseGatewayRequest(self, io, config, {error: err});
                         });
                     }
                 } else if (config.redirection != null) {
@@ -206,7 +207,7 @@ function RouteLoader() {
             for (var i = 0; i < pipeParams.length; i++) {
                 var param = pipeParams[i];
                 if (service.join_from != null) {
-                    var column = service.join_column;
+                    var joinColumn = service.join_column;
                     var joinFromArr = service.join_from.split('.');
                     var mainTable = joinFromArr[0];
                     var mainTableData = params[mainTable].data;
@@ -216,20 +217,23 @@ function RouteLoader() {
                         continue;
                     }
                     if (mainTableData.id != null) {
-                        var columnValue = mainTableData[column] != null ? mainTableData[column] : -1;
-                        if(joinFromArr.length == 2) {
-                            columnValue = columnValue[joinFromArr[1]] || -1;
+                        if(joinFromArr.length == 1) {
+                            var columnValue = mainTableData[joinColumn] != null ? mainTableData[joinColumn] : -1;
+                            pipeParamValue.push(columnValue);
+                        } else {
+                            var joinData = getJoinData(mainTableData, joinFromArr[1], joinColumn);
+                            pipeParamValue = joinData;
                         }
-                        pipeParamValue.push(columnValue);
                     } else if (mainTableData.length > 0) {
                         for (var i = 0; i < mainTableData.length; i++) {
                             var columnValue = '';
                             if(joinFromArr.length == 1) {
-                                columnValue = mainTableData[i][column] ||  -1;
+                                columnValue = mainTableData[i][joinColumn] ||  -1;
+                                pipeParamValue.push(columnValue);
                             } else {
-                                columnValue = mainTableData[i][joinFromArr[1]][column] || -1;
+                                var joinData = getJoinData(mainTableData[i], joinFromArr[1], joinColumn);
+                                pipeParamValue = pipeParamValue.concat(joinData);
                             }
-                            pipeParamValue.push(columnValue);
                         }
                     }
                     if (pipeParamValue.length == 0) {
@@ -267,6 +271,23 @@ function RouteLoader() {
                 }
             );
         });
+    }
+
+    function getJoinData(mainTableData, dataColumn, joinColumn) {
+        var joinData = mainTableData[dataColumn] || '';
+        
+        var result = [];
+        var joinColumnValue;
+        if(joinData.id != null) {
+            joinColumnValue = joinData[joinColumn] || -1;
+            result.push(joinColumnValue);
+        } else {
+            for(var i = 0; i < joinData.length; i++) {
+                joinColumnValue = joinData[i][joinColumn] || -1;
+                result.push(joinColumnValue);
+            }
+        }
+        return result;
     }
 
 
@@ -371,15 +392,30 @@ function RouteLoader() {
                 var joinFromData = io.inputs[joinFrom].data;
                 if (joinFromData != null && joinFromData.length > 0) {
                     for (var i = 0; i < joinFromData.length; i++) {
-                        if(joinFromArr.length > 1) {
-                            var columnValue = joinFromData[i][joinFromArr[1]][joinColumn] || -1;
-                        } else {
-                            var columnValue = joinFromData[i][joinColumn] || -1;
+
+                        var columnValue = '';
+                        if(joinFromArr.length > 1 && joinFromData[i][joinFromArr[1]].id != null) {
+                            columnValue = joinFromData[i][joinFromArr[1]][joinColumn] || -1;
+                        } else if (joinFromArr.length == 1){
+                            columnValue = joinFromData[i][joinColumn] || -1;
                         }
                         joinFromData[i][returnPropertype] = {};
-                        if (groupBuildData[columnValue] != null) {
+                        if (columnValue != '' && groupBuildData[columnValue] != null) {
                             joinFromData[i][returnPropertype] = groupBuildData[columnValue];
-                        } else {
+                        } 
+                        else if(joinFromData[i] != null 
+                            && joinFromData[i][joinFromArr[1]] != null
+                            && joinFromData[i][joinFromArr[1]].length > 0){
+                            for (var t = 0; t < joinFromData[i][joinFromArr[1]].length; t++) {
+                                joinFromData[i][joinFromArr[1]][t][returnPropertype] = '';
+                                columnValue = joinFromData[i][joinFromArr[1]][t][joinColumn] || -1;
+                                if(groupBuildData[columnValue] != null) {
+                                    joinFromData[i][joinFromArr[1]][t][returnPropertype] = groupBuildData[columnValue];
+                                }
+                            }
+                        }
+                        else {
+                            
                             var columnValueArr = [columnValue];
                             if(typeof  columnValue == 'string') {
                                 columnValueArr = columnValue.split(',');
@@ -397,8 +433,27 @@ function RouteLoader() {
                         }
                     }
                 } else if(typeof joinFromData == 'object') {
-                    var columnValue = joinFromData[joinColumn] != null ? joinFromData[joinColumn] : '';
-                    joinFromData[returnPropertype] = groupBuildData[columnValue];
+                    var columnValue;
+                    if(joinFromArr.length > 1) {
+                        columnValue = joinFromData[joinFromArr[1]] || -1;
+                        if(joinFromData[joinFromArr[1]].id != null) {
+                            columnValue =  joinFromData[joinFromArr[1]][joinColumn] || '';
+                            joinFromData[returnPropertype] = groupBuildData[columnValue];
+                        } else if(joinFromData[joinFromArr[1]].length > 0){
+                            for (var t = 0; t < joinFromData[joinFromArr[1]].length; t++) {
+                                joinFromData[joinFromArr[1]][t][returnPropertype] = '';
+                                columnValue = joinFromData[joinFromArr[1]][t][joinColumn] || -1;
+                                if(groupBuildData[columnValue] != null) {
+                                    joinFromData[joinFromArr[1]][t][returnPropertype] = groupBuildData[columnValue];
+                                }
+                            }
+                            //joinFromData[returnPropertype] = groupBuildData;
+                        }
+                      
+                    } else {
+                        columnValue = joinFromData[joinColumn] != null ? joinFromData[joinColumn] : '';
+                        joinFromData[returnPropertype] = groupBuildData[columnValue];
+                    }
                 }
                 io.inputs[joinFrom].data = joinFromData;
             }
@@ -408,6 +463,11 @@ function RouteLoader() {
         }
 
     }
+
+    function mapData(groupBuildData) {
+
+    }
+
     function groupData(requestResult) {
         var requestData = requestResult.data != null ? requestResult.data : [];
         var groupData = {};
