@@ -105,7 +105,7 @@ function RouteLoader() {
                             responseGatewayRequest(self, io, config, retval);
 
                         }).catch(function (err) {
-                            responseGatewayRequest(self, io, config, {error: err});
+                            responseGatewayRequest(self, io, config, {error: err.toString()});
                         });
                     }
                 } else if (config.redirection != null) {
@@ -434,10 +434,13 @@ function RouteLoader() {
                     }
                 } else if(typeof joinFromData == 'object') {
                     var columnValue;
-                    if(joinFromArr.length > 1) {
+                    if(joinFromArr.length > 1 && joinFromData[joinFromArr[1]] != null) {
                         columnValue = joinFromData[joinFromArr[1]] || -1;
                         if(joinFromData[joinFromArr[1]].id != null) {
-                            columnValue =  joinFromData[joinFromArr[1]][joinColumn] || '';
+                            columnValue = 
+                                (joinFromData[joinFromArr[1]] != null 
+                                    && joinFromData[joinFromArr[1]][joinColumn] != null)
+                                ? joinFromData[joinFromArr[1]][joinColumn] : '';
                             joinFromData[returnPropertype] = groupBuildData[columnValue];
                         } else if(joinFromData[joinFromArr[1]].length > 0){
                             for (var t = 0; t < joinFromData[joinFromArr[1]].length; t++) {
