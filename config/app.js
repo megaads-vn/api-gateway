@@ -23,5 +23,5 @@ module.exports = {
     },
     serviceToken: "xLhkjyKa",
     secret: "project-x",
-    serviceUrl: "http://localhost:1996"
+    serviceUrl: "http://127.0.0.1:85"
 };
