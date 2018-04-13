@@ -1,5 +1,5 @@
 module.exports = {
-    port: 2307,
+    port: 8866,
     debug: true,
     requestTimeout: -1,
     autoload: [
