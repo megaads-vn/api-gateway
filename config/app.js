@@ -1,5 +1,5 @@
 module.exports = {
-    port: 8866,
+    port: 2307,
     debug: true,
     requestTimeout: -1,
     autoload: [
@@ -23,5 +23,5 @@ module.exports = {
     },
     serviceToken: "xLhkjyKa",
     secret: "project-x",
-    serviceUrl: "http://127.0.0.1:85"
+    serviceUrl: "http://localhost:1996"
 };
