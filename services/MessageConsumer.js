@@ -31,7 +31,9 @@ function MessageConsumer($config, $logger, $socketIOConnection) {
             || routingKey == "data.order.deleted"
             || routingKey == "data.order_item.created"
             || routingKey == "data.order_item.updated"
-            || routingKey == "data.order_item.deleted") {
+            || routingKey == "data.order_item.deleted"
+            || routingKey == "data.group_item.deleted"
+            || routingKey == "data.group_item.deleted") {
             $socketIOConnection.sendMessageToFilteredSessions({"business_id": data.business_id}, routingKey, message);
             }
         if (routingKey == "data.order.updated") {
