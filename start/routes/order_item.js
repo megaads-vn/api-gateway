@@ -15,7 +15,7 @@ module.exports.init = function ($route) {
             },
             {
                 id: 'PRODUCT_SERVICE',
-                path: '/api/product?ids=:join_column',
+                path: '/api/product?ids=:join_column&page_size=-1',
                 method: 'get',
                 join_from: 'order_item',
                 join_column: 'product_id',
@@ -49,7 +49,7 @@ module.exports.init = function ($route) {
             },
             {
                 id: 'ORDER_SERVICE',
-                path: '/api/order?ids=:join_column',
+                path: '/api/order?ids=:join_column&page_size=-1',
                 method: 'get',
                 join_from: 'order_item',
                 join_column: 'order_id',
@@ -57,7 +57,7 @@ module.exports.init = function ($route) {
             },
             {
                 id: 'PRODUCT_SERVICE',
-                path: '/api/product?ids=:join_column',
+                path: '/api/product?ids=:join_column&page_size=-1',
                 method: 'get',
                 join_from: 'order_item',
                 join_column: 'product_id',
