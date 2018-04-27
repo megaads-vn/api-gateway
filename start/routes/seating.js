@@ -16,7 +16,7 @@ module.exports.init = function($route) {
             },
             {
                 id: 'BUSINESS_SERVICE',
-                path: '/api/business?ids=:join_column',
+                path: '/api/business?ids=:join_column&page_size=-1',
                 method: 'get',
                 join_from: 'seating',
                 join_column: 'business_id',
@@ -24,7 +24,7 @@ module.exports.init = function($route) {
             },
             {
                 id: 'USER_SERVICE',
-                path: '/api/user?ids=:join_column',
+                path: '/api/user?ids=:join_column&page_size=-1',
                 method: 'get',
                 join_from: 'seating',
                 join_column: 'creator_id',
