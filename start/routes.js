@@ -9,6 +9,7 @@ var ImageRoute = require('./routes/image');
 var OrderItem = require('./routes/order_item');
 var GroupItem = require('./routes/group_item');
 var NotificationRoute = require('./routes/notification');
+var ReportRoute = require('./routes/report');
 
 var Auth = require('../controllers/AuthController');
 var Activity = require('./activity');
@@ -38,6 +39,7 @@ module.exports = function ($route, $logger) {
         GroupItem.init($route);
         OrderItem.init($route);
         NotificationRoute.init($route);
+        ReportRoute.init($route);
     },
     {
         before: ["auth", function (io) {
